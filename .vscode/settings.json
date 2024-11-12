@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "charconv": "cpp",
+        "format": "cpp",
+        "xutility": "cpp",
+        "istream": "cpp",
+        "iterator": "cpp",
+        "ostream": "cpp",
+        "xlocmon": "cpp",
+        "xlocnum": "cpp",
+        "xstring": "cpp",
+        "ahad1": "cpp",
+        "ios": "cpp",
+        "xiosbase": "cpp",
+        "vector": "cpp"
+    }
+}

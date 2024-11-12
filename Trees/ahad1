@@ -1,0 +1,160 @@
+#include <iostream>
+using namespace std;
+class node {
+public:
+    int data;
+    node* left;
+    node* right;
+    int height;
+    node(int d) {
+        data = d;
+        left = NULL;
+        right = NULL;
+        height = 1; 
+    }
+};
+class avl {
+public:
+    node* root;
+    avl() {
+        root = NULL;
+    }
+    int getheight(node* n) {
+        return n ? n->height : 0;
+    }
+    node* rightrotate(node* y) {
+        node* x = y->left;
+        node* t2 = x->right;
+        x->right = y;
+        y->left = t2;
+        y->height = max(getheight(y->left), getheight(y->right)) + 1;
+        x->height = max(getheight(x->left), getheight(x->right)) + 1;
+        return x;
+    }
+    node* leftrotate(node* x) {
+        node* y = x->right;
+        node* t2 = y->left;
+        y->left = x;
+        x->right = t2;
+        x->height = max(getheight(x->left), getheight(x->right)) + 1;
+        y->height = max(getheight(y->left), getheight(y->right)) + 1;
+        return y;
+    }
+    int getbalance(node* n) {
+        return n ? getheight(n->left) - getheight(n->right) : 0;
+    }
+    node* insert(node* n, int data) {
+        if (!n) {
+            return new node(data);
+        }
+        if (data < n->data) {
+            n->left = insert(n->left, data);
+        } else if (data > n->data) {
+            n->right = insert(n->right, data);
+        } else {
+            return n;
+        }
+        n->height = 1 + max(getheight(n->left), getheight(n->right));
+        int balance = getbalance(n);
+        if (balance > 1 && data < n->left->data) {
+            return rightrotate(n);
+        }
+        if (balance<-1&&data > n->right->data) {
+            return leftrotate(n);
+        }
+        if (balance>1&&data>n->left->data) {
+            n->left = leftrotate(n->left);
+            return rightrotate(n);
+        }
+        if (balance<-1&&data < n->right->data) {
+            n->right=rightrotate(n->right);
+            return leftrotate(n);
+        }
+        return n;
+    }
+
+    void calculatebalancefactors(node* n) {
+        if (n) {
+            cout << "node " << n->data << ": balance factor = " << getbalance(n) << endl;
+            calculatebalancefactors(n->left);
+            calculatebalancefactors(n->right);
+        }
+    }
+    void checkheight(node* n) {
+        cout << "height: " << getheight(root) << endl;
+    }
+        void insert(int data) {
+        root = insert(root, data);
+    }
+    void preorder(node* n) {
+        if (n) {
+            cout << n->data << " ";
+            preorder(n->left);
+            preorder(n->right);
+        }
+    }
+    void inorder(node* n) {
+        if (n) {
+            inorder(n->left);
+            cout << n->data << " ";
+            inorder(n->right);
+        }
+
+    }
+};
+
+
+
+int main() {
+    avl t;
+    int arr[] = {10, 5, 15, 3, 7};
+    for (int val=0;val<5;val++) {
+        t.insert(arr[val]);
+    }
+    cout << "before inserting 12: ";
+    t.inorder(t.root);
+    cout << endl;
+    t.insert(12);
+    cout << "after inserting 12: ";
+    t.inorder(t.root);
+    cout << endl;
+    cout << "balance factors after inserting 12:" << endl;
+    t.calculatebalancefactors(t.root);
+    t.checkheight(t.root);
+    cout << "preorder traversal after inserting 12: ";
+    t.preorder(t.root);
+    cout << endl;
+    return 0;
+}
+
+
+ #include<iostream>
+ #include<vector>
+  struct TreeNode {
+      int val;
+      TreeNode *left;
+      TreeNode *right;
+      TreeNode() : val(0), left(nullptr), right(nullptr) {}
+      TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ };
+ 
+
+class Solution {
+public:
+    TreeNode* root1(TreeNode* root,vector<int> sum){
+        if(root==nullptr){
+            return;
+        }
+        if(root->right&&root->left){
+            sum.push_back(root->val+root->left->val+root->right->val);
+            root->left=root1(root->left,sum);
+            root->right=root1(root->right,sum);
+        }
+    }
+    int maxPathSum(TreeNode* root) {
+        vector<int> a;
+        root1(root,a);
+        return a.max_size();
+    }
+};
