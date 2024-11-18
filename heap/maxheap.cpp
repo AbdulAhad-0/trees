@@ -23,6 +23,7 @@ public:
             }
         }
     }
+
     void del(){
         arr[0]=arr[size-1];
         size--;
@@ -55,6 +56,15 @@ public:
                 heapify(arr,size,i);
             }
         }
+         void heapsort() {
+         int j = size;  
+        buildheap();
+        for(int i = j- 1; i > 0; i--) {
+            swap(arr[0], arr[i]);
+            j--; 
+            heapify(arr, j, 0);
+        }  
+    }
 };
 int main(){
     heap h;
@@ -69,8 +79,12 @@ int main(){
     h.buildheap();
     cout<<" \n heap array:"<<endl;
     h.print();
+
     cout<<" \n heap array after deletion:"<<endl;
     h.del();
+    h.print();
+    cout<<" \n heap sorted:"<<endl;
+    h.heapsort();
     h.print();
 
 
