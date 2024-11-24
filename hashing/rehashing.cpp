@@ -1,142 +1,99 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-
-// Initial size of the hash table
-#define INITIAL_SIZE 20
-
-// Load factor threshold for resizing
-#define LOAD_FACTOR_THRESHOLD 0.7
-
-// DataItem struct represents an element in the hash table, containing a key and data
-struct DataItem {
-   int data;
-   int key;
+class dataitem{
+    public:
+    int data;
+    int key;
 };
-
-// HashTable class implementing a hash table with open addressing and linear probing
-class HashTable {
-private:
-    vector<DataItem*> hashArray; // Vector holding pointers to DataItems
-    DataItem* dummyItem;         // Dummy item used to mark deleted slots
-    int currentSize;             // Current number of elements in the table
-    int tableSize;               // Current capacity of the table
-
-    // Hash function that returns the index based on the key
-    int hashCode(int key) {
-        return key % tableSize;
+#define insize 20
+#define loadtreshold 0.7
+class hashtable{
+    vector<dataitem*> hasharray;
+    dataitem * dummy;
+    int cursize;
+    int tablesize;
+    public:
+    hashtable(){
+        tablesize=insize;
+        cursize=0;
+        hasharray.resize(tablesize, nullptr);
+        dummy=new dataitem;
+        dummy->data=-1;
+        dummy->key=-1;
     }
-
-    // Function to resize the hash table when the load factor exceeds the threshold
-    void resizeTable() {
-        int oldSize = tableSize;
-        tableSize *= 2;  // Double the table size
-        vector<DataItem*> oldArray = hashArray; // Copy current table
-        hashArray.clear();
-        hashArray.resize(tableSize, nullptr); // Resize hash array to new size
-        currentSize = 0; // Reset size for rehashing
-
-        // Rehash each non-dummy item from old array into new table
-        for (int i = 0; i < oldSize; i++) {
-            if (oldArray[i] != nullptr && oldArray[i] != dummyItem) {
-                insert(oldArray[i]->key, oldArray[i]->data);
-                delete oldArray[i]; // Free memory for rehashed item
+    void resizetable(){
+        int oldsize=tablesize;
+        tablesize*=2;
+        vector<dataitem*> old = hasharray;
+        hasharray.resize(tablesize,nullptr);
+        cursize=0;
+        for(int i=0;i<oldsize;i++){
+            if(old[i]!=nullptr&&old[i]!=dummy){
+                insert(old[i]->data,old[i]->key);
+                delete old[i];
             }
         }
     }
-
-    // Calculate the current load factor of the hash table
-    double loadFactor() {
-        return (double)currentSize / tableSize;
-    }
-
-public:
-    // Constructor initializes the hash table with initial size and dummy item for deletions
-    HashTable() : tableSize(INITIAL_SIZE), currentSize(0) {
-        hashArray.resize(tableSize, nullptr); // Allocate space in the hash array
-        dummyItem = new DataItem;             // Create dummy item for deleted slots
-        dummyItem->data = -1;
-        dummyItem->key = -1;
-    }
-
-    // Destructor to free memory for all dynamically allocated items
-    ~HashTable() {
-        for (auto item : hashArray) {
-            if (item != nullptr && item != dummyItem) {
-                delete item; // Delete each non-dummy item
-            }
+    double loadfactor(){
+        return (double)(cursize/tablesize);
         }
-        delete dummyItem; // Delete dummy item
+    int hashcode(int key) {
+        return key % tablesize;
     }
-
-    // Search function for finding an item by its key
-    DataItem* search(int key) {
-        int hashIndex = hashCode(key); // Calculate initial hash index
-        while (hashArray[hashIndex] != nullptr) { // Linear probing for collision resolution
-            if (hashArray[hashIndex] != dummyItem && hashArray[hashIndex]->key == key)
-                return hashArray[hashIndex]; // Return item if key matches
-            hashIndex = (hashIndex + 1) % tableSize; // Move to next index
+    void insert(int data,int key){
+        if(loadfactor()>loadtreshold){
+            resizetable();
         }
-        return nullptr; // Return null if key not found
-    }
-
-    // Insert function to add a new item to the hash table
-    void insert(int key, int data) {
-        // Check load factor and resize table if needed
-        if (loadFactor() > LOAD_FACTOR_THRESHOLD) {
-            resizeTable();
-        }
-
-        DataItem* item = new DataItem;
-        item->data = data;
-        item->key = key;
-        int hashIndex = hashCode(key); // Calculate hash index
-
-        // Find an empty slot or update an existing slot with the same key
-        while (hashArray[hashIndex] != nullptr && hashArray[hashIndex] != dummyItem && hashArray[hashIndex]->key != -1) {
-            if (hashArray[hashIndex]->key == key) {
-                delete item; // If key exists, update data and free new item
-                hashArray[hashIndex]->data = data;
+        dataitem *a=new dataitem;
+        a->data=data;
+        a->key=key;
+        int hidx=hashcode(key);
+        while(hasharray[hidx]!=nullptr&&hasharray[hidx]!=dummy&&hasharray[hidx]->key!=-1){
+            if(hasharray[hidx]->key==key){
+                delete a;
+                hasharray[hidx]->data=data;
                 return;
             }
-            hashIndex = (hashIndex + 1) % tableSize; // Linear probing
+            hidx=(hidx+1)%tablesize;
         }
-        hashArray[hashIndex] = item; // Place item in found slot
-        currentSize++; // Increment size
+        hasharray[hidx]=a;
+        cursize++;
     }
-
-    // Delete function removes an item with the specified key
-    DataItem* deleteItem(int key) {
-        int hashIndex = hashCode(key); // Calculate initial hash index
-        while (hashArray[hashIndex] != nullptr) { // Linear probing to find the item
-            if (hashArray[hashIndex] != dummyItem && hashArray[hashIndex]->key == key) {
-                DataItem* temp = hashArray[hashIndex]; // Save item to return
-                hashArray[hashIndex] = dummyItem; // Mark slot as deleted
-                currentSize--; // Decrement size
-                return temp; // Return deleted item
+    dataitem *deleteitem(int key){
+         int hidx=hashcode(key);
+        while(hasharray[hidx]!=nullptr&&hasharray[hidx]!=dummy&&hasharray[hidx]->key!=-1){
+            if(hasharray[hidx]->key==key){
+                dataitem *temp=hasharray[hidx];
+                hasharray[hidx]=dummy;
+                cursize--;
+                return temp;
             }
-            hashIndex = (hashIndex + 1) % tableSize; // Move to next index
+            hidx=(hidx+1)%tablesize;
         }
-        return nullptr; // Return null if item not found
+      return nullptr;
     }
-
-    // Display function to print the contents of the hash table
-    void display() const {
-        for (int i = 0; i < tableSize; i++) {
-            if (hashArray[i] != nullptr && hashArray[i] != dummyItem)
-                cout << " (" << hashArray[i]->key << "," << hashArray[i]->data << ")"; // Print key-value pair
+    dataitem* search(int key){
+         int hidx=hashcode(key);
+        while(hasharray[hidx]!=nullptr&&hasharray[hidx]!=dummy&&hasharray[hidx]->key!=-1){
+            if(hasharray[hidx]->key==key)
+                return hasharray[hidx];
+            hidx=(hidx+1)%tablesize;
+        }
+        return nullptr;
+    }
+    void display(){
+        for (int i=0;i< tablesize;i++) {
+            if (hasharray[i]!=nullptr&&hasharray[i]!=dummy)
+                cout<<" ("<< hasharray[i]->key<<","<< hasharray[i]->data<<")"; 
             else
-                cout << " ~~ "; // Print placeholder for empty or deleted slot
+                cout << " ~~ ";
         }
         cout << endl;
     }
 };
-
-// Main function to test the hash table
-int main() {
-    HashTable hashTable;
-
-    // Insert items into the hash table
+int main(){
+     hashtable hashTable;
     hashTable.insert(1, 20);
     hashTable.insert(2, 70);
     hashTable.insert(42, 80);
@@ -146,25 +103,18 @@ int main() {
     hashTable.insert(17, 11);
     hashTable.insert(13, 78);
     hashTable.insert(37, 97);
-
-    // Display the hash table contents
     cout << "Contents of Hash Table: ";
     hashTable.display();
-
-    // Search for an element
-    int ele = 37;
-    cout << "Searching for element: " << ele;
-    DataItem* item = hashTable.search(ele);
+    int ele=37;
+    cout <<"Searching for element: "<<ele;
+    dataitem*item = hashTable.search(ele);
     if (item != nullptr) {
-        cout << "\nElement found: (" << item->key << ", " << item->data << ")";
+        cout << "\nElement found: ("<<item->key << ", "<< item->data<<")";
     } else {
         cout << "\nElement not found";
     }
-
-    // Delete an element
-    hashTable.deleteItem(ele);
+    hashTable.deleteitem(ele);
     cout << "\nHash Table contents after deletion: ";
     hashTable.display();
-
     return 0;
 }
