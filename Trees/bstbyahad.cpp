@@ -82,7 +82,7 @@ public:
             inorder(n->right);
         }
     }
-
+    
     void postorder(node* n) {
         if (n) {
             postorder(n->left);

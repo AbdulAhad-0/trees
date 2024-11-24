@@ -64,6 +64,7 @@ node*rotateleft(node *n){
     int getbalance(node*n){
         return (getHeight(root->left)-getHeight(root->right));
     }
+    
     public:
     node* root;
     avl():root(NULL){}
@@ -72,4 +73,5 @@ node*rotateleft(node *n){
         node* n=new node(d);
         root=inserthelper(root,n);
     }
+    
 };

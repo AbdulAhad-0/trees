@@ -14,6 +14,9 @@
         "ios": "cpp",
         "xiosbase": "cpp",
         "vector": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "array": "cpp",
+        "ranges": "cpp",
+        "span": "cpp"
     }
 }
