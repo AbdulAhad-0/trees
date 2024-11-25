@@ -1,14 +1,11 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-using namespace std;
 #define SIZE 20
-
 struct DataItem {
    int data;
    int key;
 };
-
 std::vector<DataItem*> hashArray(SIZE, nullptr);
 DataItem* dummyItem;
 DataItem* item;
@@ -84,7 +81,6 @@ int main() {
    } else {
       cout << "\nElement not found" << item->key;
    }
-   // Clean up allocated memory
    delete(item);
    cout<<"\nHash Table contents after deletion: ";
    display();
