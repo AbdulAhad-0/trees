@@ -3,20 +3,26 @@ using namespace std;
 
 class heap {
 public:
-    int arr[100];
+    struct Pair {
+        int first;
+        int second;
+    };
+
+    Pair arr[100];
     int size;
 
     heap() {
-        size = 0;        
+        size = 0;
     }
 
-    void insert(int d) {    
-        arr[size] = d;
+    void insert(int a, int b) {
+        arr[size].first = a;
+        arr[size].second = b;
         size++;
         int i = size - 1;
         while(i > 0) {
             int p = (i - 1) / 2;
-            if(arr[i] < arr[p]) {
+            if(arr[i].first + arr[i].second > arr[p].first + arr[p].second) {
                 swap(arr[i], arr[p]);
                 i = p;
             } else {
@@ -35,17 +41,17 @@ public:
     void heapify(int i) {
         int left = 2 * i + 1;
         int right = 2 * i + 2;
-        int smallest = i;
+        int largest = i;
 
-        if (left < size && arr[left] < arr[smallest]) {
-            smallest = left;
+        if (left < size && (arr[left].first + arr[left].second) > (arr[largest].first + arr[largest].second)) {
+            largest = left;
         }
-        if (right < size && arr[right] < arr[smallest]) {
-            smallest = right;
+        if (right < size && (arr[right].first + arr[right].second) > (arr[largest].first + arr[largest].second)) {
+            largest = right;
         }
-        if (smallest != i) {
-            swap(arr[i], arr[smallest]);
-            heapify(smallest);
+        if (largest != i) {
+            swap(arr[i], arr[largest]);
+            heapify(largest);
         }
     }
 
@@ -66,7 +72,7 @@ public:
 
     void print() {
         for(int i = 0; i < size; i++) {
-            cout << " " << arr[i];
+            cout << "(" << arr[i].first << ", " << arr[i].second << ") ";
         }
         cout << endl;
     }
@@ -74,24 +80,26 @@ public:
 
 int main() {
     heap h;
-    h.insert(50);
-    h.insert(55);
-    h.insert(53);
-    h.insert(52);
-    h.insert(54);
+    h.insert(50, 10);
+    h.insert(55, 5);
+    h.insert(53, 7);
+    h.insert(52, 9);
+    h.insert(54, 6);
 
     cout << "\nHeap array after insertion:" << endl;
     h.print();
-    
+
     h.buildheap();
-    cout << "\nHeap array after building min heap:" << endl;
+    cout << "\nHeap array after building max heap based on sum:" << endl;
     h.print();
 
     h.del();
     cout << "\nHeap array after deletion:" << endl;
     h.print();
+
     h.heapSort();
     cout << "\nArray after heap sort:" << endl;
     h.print();
+
     return 0;
 }

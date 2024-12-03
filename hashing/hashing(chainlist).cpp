@@ -11,11 +11,9 @@ public:
 
     dataitem(int k, string d) : key(k), data(d), next(nullptr) {}
 };
-
-class sll { // Singly Linked List
+class sll { 
 public:
     dataitem* root;
-
     sll() : root(nullptr) {}
 
     void insert(int key, string data) {
