@@ -1,108 +1,146 @@
 #include <iostream>
+#include <algorithm> 
 using namespace std;
 
 class node {
 public:
-    int data;
-    node* left;
-    node* right;
+    int val;
+    node *left;
+    node *right;
     int height;
-    
-    node(int d) {
-        data = d;
-        left = NULL;
-        right = NULL;
-        height = 1; 
-    }
+
+    node(int v) : val(v), left(nullptr), right(nullptr), height(1) {}
 };
 
 class avl {
-public:
-    node* root;
+private:
+    node *root = nullptr;
 
-    avl() {
-        root = NULL;
-    }
-    
-    node* rightrotate(node* y) {
-        node* x = y->left;
-        node* t2 = x->right;
-        x->right = y;
-        y->left = t2;
-        y->height = max(getheight(y->left), getheight(y->right)) + 1;
-        x->height = max(getheight(x->left), getheight(x->right)) + 1;
-        return x;
-    }
-    int getheight(node* n) {
-        return n ? n->height : 0;
-    }
-    node* leftrotate(node* x) {
-        node* y = x->right;
-        node* t2 = y->left;
-        y->left = x;
-        x->right = t2;
-        x->height = max(getheight(x->left), getheight(x->right)) + 1;
-        y->height = max(getheight(y->left), getheight(y->right)) + 1;
-        return y;
+    int getheight(node *n) {
+        return n == nullptr ? 0 : n->height;
     }
 
-    int getbalance(node* n) {
-        return n ? getheight(n->left) - getheight(n->right) : 0;
+    int getbalance(node *n) {
+        return n == nullptr ? 0 : getheight(n->left) - getheight(n->right);
     }
 
-    node* insert(node* n, int data) {
-        if (n == NULL) {
-            return new node(data);
+    node* leftrotate(node *n) {
+        node *t1 = n->right;
+        node *t2 = t1->left;
+        t1->left = n;
+        n->right = t2;
+        n->height = max(getheight(n->left), getheight(n->right)) + 1;
+        t1->height = max(getheight(t1->left), getheight(t1->right)) + 1;
+        return t1;
+    }
+
+    node* rightrotate(node *n) {
+        node *t1 = n->left;
+        node *t2 = t1->right;
+        t1->right = n;
+        n->left = t2;
+        n->height = max(getheight(n->left), getheight(n->right)) + 1;
+        t1->height = max(getheight(t1->left), getheight(t1->right)) + 1;
+        return t1;
+    }
+
+    node* balance(node *root, int key) {
+        int bal = getbalance(root);
+        if (bal > 1 && key < root->left->val)
+            return rightrotate(root);
+        if (bal < -1 && key > root->right->val)
+            return leftrotate(root);
+        if (bal > 1 && key > root->left->val) {
+            root->left = leftrotate(root->left);
+            return rightrotate(root);
         }
-        if (data < n->data) {
-            n->left = insert(n->left, data);
-        } else if (data > n->data) {
-            n->right = insert(n->right, data);
-        } else {
-            return n;
+        if (bal < -1 && key < root->right->val) {
+            root->right = rightrotate(root->right);
+            return leftrotate(root);
         }
-        n->height = 1 + max(getheight(n->left), getheight(n->right));
-        int bal = getbalance(n);
-        if (bal > 1 && data < n->left->data) {
-            return rightrotate(n);
+        return root;
+    }
+    node* inserthelper(node* root, int key) {
+        if (root == nullptr) {
+            return new node(key);
         }
-        if (bal<-1&&data>n->right->data) {return leftrotate(n);}
-        if (bal> 1 && data > n->left->data) {
-            n->left = leftrotate(n->left);
-            return rightrotate(n);
-        }
-        if (bal<-1&&data<n->right->data) {
-            n->right=rightrotate(n->right);
-            return leftrotate(n);
+        if (key < root->val)
+            root->left = inserthelper(root->left, key);
+        else if (key > root->val)
+            root->right = inserthelper(root->right, key);
+        else
+            return root;
+
+        root->height = 1 + max(getheight(root->left), getheight(root->right));
+        return balance(root, key);
+    }
+
+    node* findMin(node *n) {
+        while (n->left != nullptr) {
+            n = n->left;
         }
         return n;
     }
-    void insert(int data) {
-        root = insert(root, data);
+
+    node* removehelper(node *root, int key) {
+        if (root == nullptr) {
+            return nullptr;
+        }
+        if (key < root->val) {
+            root->left = removehelper(root->left, key);
+        } else if (key > root->val) {
+            root->right = removehelper(root->right, key);
+        } else { // Node found
+            if (root->left == nullptr || root->right == nullptr) {
+                node *temp = root->left ? root->left : root->right;
+                delete root;
+                return temp;
+            }
+            node *replace = findMin(root->right);
+            root->val = replace->val;
+            root->right = removehelper(root->right, replace->val);
+        }
+
+        root->height = 1 + max(getheight(root->left), getheight(root->right));
+        return balance(root, key);
     }
-    void preorder(node* n) {
-        if (n != NULL) {
-            cout << n->data << " ";
-            preorder(n->left);
-            preorder(n->right);
+
+public:
+    void insert(int key) {
+        root = inserthelper(root, key);
+    }
+
+    void remove(int key) {
+        root = removehelper(root, key);
+    }
+
+    void inorder(node* root) {
+        if (root != nullptr) {
+            inorder(root->left);
+            cout << root->val << " ";
+            inorder(root->right);
         }
     }
-    void leftrotateroot() {
-        if (root) {
-            root = leftrotate(root);
-        }
+
+    void printInorder() {
+        inorder(root);
+        cout << endl;
     }
 };
+
 int main() {
-    avl t;
-    int initialvalues[] = {50, 30, 70, 20, 40, 60, 80};
-    for (int value : initialvalues) {
-        t.insert(value);
-    }
-    t.insert(55);
-    t.leftrotateroot();
-    cout << "preorder traversal after left rotation on the root: ";
-    t.preorder(t.root);
-    cout << endl;
+    avl tree;
+    tree.insert(10);
+    tree.insert(20);
+    tree.insert(30);
+    tree.insert(40);
+    tree.insert(50);
+    tree.insert(25);
+    cout << "Inorder traversal of the AVL tree is: ";
+    tree.printInorder();
+    tree.remove(50);
+    cout << "After removing 50, inorder traversal is: ";
+    tree.printInorder();
+
     return 0;
 }

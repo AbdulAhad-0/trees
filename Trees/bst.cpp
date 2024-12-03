@@ -23,12 +23,10 @@ class BinarySearchTree{
             root = newNode;
             return root;
         }
-        if(newNode->data < root->data){
-            root->left = insertHelper(root->left,newNode);
-        }
-        else{
-            root->right = insertHelper(root->right,newNode);
-        }
+        if(newNode->data<root->data)
+            root->left=insertHelper(root->left,newNode);
+        else
+            root->right=insertHelper(root->right,newNode);
         return root;
     }
     void iterativeInsert(int data){
