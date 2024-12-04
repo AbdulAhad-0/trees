@@ -21,7 +21,6 @@ public:
         newItem->next = root;
         root = newItem;
     }
-
     dataitem* search(int key) {
         dataitem* current = root;
         while (current) {
