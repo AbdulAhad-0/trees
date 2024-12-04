@@ -5,11 +5,9 @@ class heap {
 public:
     int arr[100];
     int size;
-
     heap() {
         size = 0;        
     }
-
     void insert(int d) {    
         arr[size] = d;
         size++;
@@ -24,7 +22,6 @@ public:
             }
         }
     }
-
     void del() {
         if(size <= 0) return;
         arr[0] = arr[size - 1];
