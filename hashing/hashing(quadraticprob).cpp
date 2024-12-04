@@ -21,7 +21,6 @@ public:
     int hash(int key) {
         return key % size;  // Simple hash function (modulo operation)
     }
-
     // Function to insert a key using quadratic probing
     void insert(int key) {
         int index = hash(key);  // Get the initial index

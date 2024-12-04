@@ -6,7 +6,7 @@ struct DataItem {
    int data;
    int key;
 };
-std::vector<DataItem*> hashArray(SIZE, nullptr);
+vector<DataItem*> hashArray(SIZE, nullptr);
 DataItem* dummyItem;
 DataItem* item;
 int hashCode(int key) {
@@ -81,7 +81,7 @@ int main() {
    } else {
       cout << "\nElement not found" << item->key;
    }
-   delete(item);
+   deleteItem(item);
    cout<<"\nHash Table contents after deletion: ";
    display();
 }
