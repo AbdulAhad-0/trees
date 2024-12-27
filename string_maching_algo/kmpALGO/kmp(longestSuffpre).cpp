@@ -23,4 +23,5 @@ int main(){
         }
     }
     cout<<"maximum size: "<<lps[s.size()-1]<<" 😍";
+    
 }
